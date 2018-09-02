@@ -12,6 +12,12 @@ struct node
 	int balance_factor;
 };
 
+struct k_struct
+{
+	int k;
+	int kse;
+};
+
 struct node * root = NULL;
 
 struct node * create_node(int val)
@@ -434,6 +440,39 @@ int remove(int val)
 	return 1;
 }
 
+struct k_struct find_kth_smallest(struct node * curr_node, struct k_struct ks)
+{
+	if(curr_node==NULL)
+	{
+		return ks;
+	}
+	ks = find_kth_smallest(curr_node->left_child, ks);
+	int set = 0;
+	if(ks.k>0)
+	{
+		ks.k--;
+		if(ks.k==0)
+		{
+			set = 1;
+		}
+	}
+	if(set)
+	{
+		ks.kse = curr_node->value;
+	}
+	ks = find_kth_smallest(curr_node->right_child, ks);
+	return ks;
+}
+
+int find_kth_smallest(int k)
+{
+	struct k_struct ks;
+	ks.k = k;
+	ks.kse = 0;
+	ks = find_kth_smallest(root,ks);
+	return ks.kse;
+}
+
 void print_tree()
 {
 	if(root==NULL)
@@ -471,26 +510,15 @@ void print_tree()
 
 int main()
 {
-	for(int i=1; i<=100; i++)
-	{
-		insert(i);
-	}
-	cout<<"\n";
-	print_tree();
-	cout<<"\n";
-	for(int i=50; i>=1; i--)
-	{
-		remove(i);
-	}
-	cout<<"\n";
-	print_tree();
-	cout<<"\n";
-	for(int i=51; i<=100; i++)
-	{
-		remove(i);
-	}
-	cout<<"\n";
-	print_tree();
+	insert(30);
+	insert(15);
+	insert(40);
+	insert(10);
+	insert(25);
+	insert(35);
+	insert(50);
+	insert(5);
+	cout<<find_kth_smallest(4);
 	cout<<"\n";
 	return 0;
 }
