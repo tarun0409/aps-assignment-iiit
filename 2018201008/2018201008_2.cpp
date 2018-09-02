@@ -78,6 +78,10 @@ void left_left_rotation(struct node * curr_node)
 	struct node * temp = curr_node ->right_child;
 	curr_node->right_child = curr_node->parent;
 	curr_node->parent->left_child = temp;
+	if(temp!=NULL)
+	{
+		temp->parent = curr_node->parent;
+	}
 	if(curr_node->parent == root)
 	{
 		root = curr_node;
@@ -105,6 +109,10 @@ void right_right_rotation(struct node * curr_node)
 	struct node * temp = curr_node->left_child;
 	curr_node->left_child = curr_node->parent;
 	curr_node->parent->right_child = temp;
+	if(temp!=NULL)
+	{
+		temp->parent = curr_node->parent;
+	}
 	if(curr_node->parent==root)
 	{
 		root = curr_node;
@@ -131,6 +139,10 @@ void left_right_rotation(struct node * curr_node)
 	struct node * temp1 = curr_node->left_child;
 	curr_node->left_child = curr_node->parent;
 	curr_node->parent->right_child = temp1;
+	if(temp1!=NULL)
+	{
+		temp1->parent = curr_node->parent;
+	}
 	curr_node->parent->parent->left_child = curr_node;
 	struct node * temp2 = curr_node->parent;
 	curr_node->parent = curr_node->parent->parent;
@@ -142,6 +154,10 @@ void right_left_rotation(struct node * curr_node)
 	struct node * temp1 = curr_node->right_child;
 	curr_node->right_child = curr_node->parent;
 	curr_node->parent->left_child = temp1;
+	if(temp1!=NULL)
+	{
+		temp1->parent = curr_node->parent;
+	}
 	curr_node->parent->parent->right_child = curr_node;
 	struct node * temp2 = curr_node->parent;
 	curr_node->parent = curr_node->parent->parent;
@@ -150,11 +166,14 @@ void right_left_rotation(struct node * curr_node)
 
 void check_and_balance_tree(struct node * curr_node)
 {
+	if(curr_node==NULL)
+	{
+		return;
+	}
 	if(curr_node->balance_factor>1)
 	{
 		if(curr_node->left_child->balance_factor > 0)
 		{
-			cout<<endl<<"Left-Left-Imbalance"<<endl;
 			struct node * temp_curr = curr_node->left_child;
 			left_left_rotation(curr_node->left_child);
 			if(temp_curr->left_child!=NULL)
@@ -172,7 +191,6 @@ void check_and_balance_tree(struct node * curr_node)
 		}
 		else if(curr_node->left_child->balance_factor<0)
 		{
-			cout<<endl<<"Left-Right-Imbalance"<<endl;
 			left_right_rotation(curr_node->left_child->right_child);
 			struct node * temp_curr = curr_node->left_child;
 			left_left_rotation(curr_node->left_child);
@@ -194,7 +212,6 @@ void check_and_balance_tree(struct node * curr_node)
 	{
 		if(curr_node->right_child->balance_factor < 0)
 		{
-			cout<<endl<<"Right-Right-Imbalance"<<endl;
 			struct node * temp_curr = curr_node->right_child;
 			right_right_rotation(curr_node->right_child);
 			if(temp_curr->left_child!=NULL)
@@ -212,7 +229,6 @@ void check_and_balance_tree(struct node * curr_node)
 		}
 		else if(curr_node->right_child->balance_factor>0)
 		{
-			cout<<endl<<"Right-Left-Imbalance"<<endl;
 			right_left_rotation(curr_node->right_child->left_child);
 			struct node * temp_curr = curr_node->right_child;
 			right_right_rotation(curr_node->right_child);
@@ -230,6 +246,24 @@ void check_and_balance_tree(struct node * curr_node)
 			update_balance_factor(temp_curr);
 		}
 	}
+}
+
+struct node * find_predecessor(struct node * curr_node)
+{
+	if(curr_node==NULL)
+	{
+		return NULL;
+	}
+	if(curr_node->left_child == NULL)
+	{
+		return curr_node;
+	}
+	struct node * temp = curr_node->left_child;
+	while(temp->right_child!=NULL)
+	{
+		temp = temp->right_child;
+	}
+	return temp;
 }
 
 int insert_node(struct node * curr_node, struct node * new_node)
@@ -289,10 +323,122 @@ int insert_node(struct node * curr_node, struct node * new_node)
 	return status;
 }
 
+int insert(int new_val)
+{
+	return insert_node(root,create_node(new_val));
+}
+
+struct node * find_node(struct node * curr_node, int target)
+{
+	struct node * dest = NULL;
+	if(root==NULL)
+	{
+		return NULL;
+	}
+	if((curr_node->value) == target)
+	{
+		return curr_node;
+	}
+	else if(((curr_node->value) > target) && curr_node->left_child!=NULL)
+	{
+		dest = find_node(curr_node->left_child, target);
+	}
+	else if(((curr_node->value)<target) && curr_node->right_child!=NULL)
+	{
+		dest = find_node(curr_node->right_child, target);
+	}
+	return dest;
+}
+
+struct node * find(int target)
+{
+	return find_node(root,target);
+}
+
+int remove(int val)
+{
+	struct node * curr_node = find(val);
+	if(curr_node==NULL)
+	{
+		return 0;
+	}
+	if(curr_node->left_child==NULL)
+	{
+		if(curr_node==root)
+		{
+			root = curr_node->right_child;
+			if(curr_node->right_child!=NULL)
+			{
+				curr_node->right_child->parent = NULL;
+			}
+		}
+		else
+		{
+			if(curr_node->parent->left_child == curr_node)
+			{
+				curr_node->parent->left_child = curr_node->right_child;
+			}	
+			else if(curr_node->parent->right_child == curr_node)
+			{
+				curr_node->parent->right_child = curr_node->right_child;
+			}	
+			if(curr_node->right_child!=NULL)
+			{
+				curr_node->right_child->parent = curr_node->parent;
+			}		
+		}
+		curr_node = curr_node->parent;
+	}
+	else
+	{
+		struct node * pred = find_predecessor(curr_node);
+		if(pred->value == 3)
+		{
+				int x;
+		}
+		curr_node->value = pred->value;
+		
+		if(pred->parent == root)
+		{
+			root = pred->left_child;
+			if(pred->left_child!=NULL)
+			{
+				pred->left_child->parent = NULL;
+			}
+		}
+		else
+		{
+			if(pred->parent->left_child == pred)
+			{
+				pred->parent->left_child = pred->left_child;
+			}
+			else if(pred->parent->right_child == pred)
+			{
+				pred->parent->right_child = pred->left_child;
+			}
+			if(pred->left_child!=NULL)
+			{
+				pred->left_child->parent = pred->parent;
+			}
+		}
+		curr_node = pred->parent;
+	}
+	
+	while(curr_node!=NULL)
+	{
+		update_height(curr_node);
+		update_balance_factor(curr_node);
+		check_and_balance_tree(curr_node);
+		curr_node = curr_node->parent;
+	}
+	return 1;
+}
+
 void print_tree()
 {
 	if(root==NULL)
 	{
+		cout<<"\nTree is empty\n";
 		return;
 	}
 	queue<struct node *> bfsq;
@@ -301,7 +447,16 @@ void print_tree()
 	{
 		struct node * curr_node = bfsq.front();
 		bfsq.pop();
-		cout<<"("<<curr_node->value<<"  "<<curr_node->height<<"  "<<curr_node->balance_factor<<")";
+		int p;
+		if(curr_node->parent==NULL)
+		{
+			p=-1;
+		}
+		else
+		{
+			p = curr_node->parent->value;
+		}
+		cout<<"("<<curr_node->value<<"  "<<curr_node->height<<"  "<<curr_node->balance_factor<<"  "<<p<<")";
 		if(curr_node->left_child!=NULL)
 		{
 			bfsq.push((curr_node->left_child));
@@ -316,30 +471,26 @@ void print_tree()
 
 int main()
 {
-	//insert_node(root, create_node(4));
-	//insert_node(root, create_node(3));
-	//insert_node(root, create_node(2));
-	//insert_node(root, create_node(8));
-	//insert_node(root, create_node(9));
-	//insert_node(root, create_node(5));
-	
-	insert_node(root, create_node(22));
-	insert_node(root, create_node(14));
-	insert_node(root, create_node(28));
-	insert_node(root, create_node(8));
-	insert_node(root, create_node(19));
-	insert_node(root, create_node(25));
-	insert_node(root, create_node(31));
-	insert_node(root, create_node(23));
-	insert_node(root, create_node(27));
-	insert_node(root, create_node(37));
-	insert_node(root, create_node(26));
-	insert_node(root, create_node(34));
-	insert_node(root, create_node(40));
-	insert_node(root, create_node(29));
-	insert_node(root, create_node(33));
-	insert_node(root, create_node(32));
+	for(int i=1; i<=100; i++)
+	{
+		insert(i);
+	}
 	cout<<"\n";
 	print_tree();
+	cout<<"\n";
+	for(int i=50; i>=1; i--)
+	{
+		remove(i);
+	}
+	cout<<"\n";
+	print_tree();
+	cout<<"\n";
+	for(int i=51; i<=100; i++)
+	{
+		remove(i);
+	}
+	cout<<"\n";
+	print_tree();
+	cout<<"\n";
 	return 0;
 }
