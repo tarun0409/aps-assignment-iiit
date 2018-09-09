@@ -1,4 +1,5 @@
 #include<iostream>
+#include<stdio.h>
 #include<queue>
 using namespace std;
 
@@ -10,12 +11,8 @@ struct node
 	struct node * parent;
 	int height;
 	int balance_factor;
-};
-
-struct k_struct
-{
-	int k;
-	int kse;
+	int left_children;
+	int right_children;
 };
 
 class AVLTree
@@ -32,9 +29,11 @@ class AVLTree
 		new_node->parent = NULL;
 		new_node->height = 1;
 		new_node->balance_factor = 0;
-		return new_node;	
-	}	
-	
+		new_node->left_children = 0;
+		new_node->right_children = 0;
+		return new_node;
+	}
+
 	void update_height(struct node * curr_node)
 	{
 		int max_h = -1;
@@ -55,11 +54,11 @@ class AVLTree
 		if(max_h>-1)
 		{
 			curr_node->height = (max_h+1);
-		}	
+		}
 		else if(max_h==-1)
 		{
 			curr_node->height = 1;
-		}	
+		}
 	}
 
 	void update_balance_factor(struct node * curr_node)
@@ -70,7 +69,7 @@ class AVLTree
 		{
 			int x = 0;
 			x++;
-		}	
+		}
 		if(curr_node->left_child!=NULL)
 		{
 			l_h = curr_node->left_child->height;
@@ -86,17 +85,21 @@ class AVLTree
 	{
 		struct node * temp = curr_node ->right_child;
 		curr_node->right_child = curr_node->parent;
+		int p_n = (curr_node->parent->right_children) + (curr_node->right_children);
+		int c_n = curr_node->right_children;
+		curr_node->right_children = p_n+1;
 		curr_node->parent->left_child = temp;
+		curr_node->parent->left_children = c_n;
 		if(temp!=NULL)
-		{	
+		{
 			temp->parent = curr_node->parent;
-		}	
+		}
 		if(curr_node->parent == root)
 		{
 			root = curr_node;
 			curr_node->parent->parent = curr_node;
 			curr_node->parent = NULL;
-		}	
+		}
 		else
 		{
 			if((curr_node->parent->parent->value) > (curr_node->parent->value))
@@ -110,14 +113,18 @@ class AVLTree
 			struct node * temp_parent = curr_node->parent;
 			curr_node->parent = curr_node->parent->parent;
 			temp_parent->parent = curr_node;
-		}	
+		}
 	}
 
 	void right_right_rotation(struct node * curr_node)
 	{
 		struct node * temp = curr_node->left_child;
 		curr_node->left_child = curr_node->parent;
+		int p_n = (curr_node->parent->left_children) + (curr_node->left_children);
+		int c_n = curr_node->left_children;
+		curr_node->left_children = p_n+1;
 		curr_node->parent->right_child = temp;
+		curr_node->parent->right_children = c_n;
 		if(temp!=NULL)
 		{
 			temp->parent = curr_node->parent;
@@ -127,7 +134,7 @@ class AVLTree
 			root = curr_node;
 			curr_node->parent->parent = curr_node;
 			curr_node->parent = NULL;
-		}	
+		}
 		else
 		{
 			if((curr_node->parent->parent->value) > (curr_node->parent->value))
@@ -148,43 +155,55 @@ class AVLTree
 		struct node * temp1 = curr_node->left_child;
 		curr_node->left_child = curr_node->parent;
 		curr_node->parent->right_child = temp1;
+		int p_n = (curr_node->parent->left_children) + (curr_node->left_children);
+		int c_n = curr_node->left_children;
+		curr_node->left_children = p_n+1;
+		curr_node->parent->right_children = c_n;
 		if(temp1!=NULL)
 		{
 			temp1->parent = curr_node->parent;
-		}	
+		}
 		curr_node->parent->parent->left_child = curr_node;
+		curr_node->parent->parent->left_children = (curr_node->left_children + curr_node->right_children);
 		struct node * temp2 = curr_node->parent;
 		curr_node->parent = curr_node->parent->parent;
 		temp2->parent = curr_node;
-	}	
+	}
 
 	void right_left_rotation(struct node * curr_node)
 	{
 		struct node * temp1 = curr_node->right_child;
 		curr_node->right_child = curr_node->parent;
 		curr_node->parent->left_child = temp1;
+		int p_n = (curr_node->parent->right_children) + (curr_node->right_children);
+		int c_n = curr_node->right_children;
+		curr_node->right_children = p_n+1;
+		curr_node->parent->left_children = c_n;
 		if(temp1!=NULL)
 		{
 			temp1->parent = curr_node->parent;
-		}	
+		}
 		curr_node->parent->parent->right_child = curr_node;
+		curr_node->parent->parent->right_children = (curr_node->left_children + curr_node->right_children);
 		struct node * temp2 = curr_node->parent;
 		curr_node->parent = curr_node->parent->parent;
 		temp2->parent  = curr_node;
-	}	
+	}
 
-	void check_and_balance_tree(struct node * curr_node)
+	int check_and_balance_tree(struct node * curr_node)
 	{
+		int change = 0;
 		if(curr_node==NULL)
 		{
-			return;
-		}	
+			return change;
+		}
 		if(curr_node->balance_factor>1)
 		{
 			if(curr_node->left_child->balance_factor > 0)
 			{
 				struct node * temp_curr = curr_node->left_child;
 				left_left_rotation(curr_node->left_child);
+				change = 1;
 				if(temp_curr->left_child!=NULL)
 				{
 					update_height(temp_curr->left_child);
@@ -203,6 +222,7 @@ class AVLTree
 				left_right_rotation(curr_node->left_child->right_child);
 				struct node * temp_curr = curr_node->left_child;
 				left_left_rotation(curr_node->left_child);
+				change = 1;
 				if(temp_curr->left_child!=NULL)
 				{
 					update_height(temp_curr->left_child);
@@ -212,10 +232,10 @@ class AVLTree
 				{
 					update_height(temp_curr->right_child);
 					update_balance_factor(temp_curr->right_child);
-				}	
+				}
 				update_height(temp_curr);
 				update_balance_factor(temp_curr);
-			}	
+			}
 		}
 		else if(curr_node->balance_factor<-1)
 		{
@@ -223,6 +243,7 @@ class AVLTree
 			{
 				struct node * temp_curr = curr_node->right_child;
 				right_right_rotation(curr_node->right_child);
+				change = 1;
 				if(temp_curr->left_child!=NULL)
 				{
 					update_height(temp_curr->left_child);
@@ -241,20 +262,22 @@ class AVLTree
 				right_left_rotation(curr_node->right_child->left_child);
 				struct node * temp_curr = curr_node->right_child;
 				right_right_rotation(curr_node->right_child);
+				change = 1;
 				if(temp_curr->left_child!=NULL)
 				{
 					update_height(temp_curr->left_child);
 					update_balance_factor(temp_curr->left_child);
-				}	
+				}
 				if(temp_curr->right_child!=NULL)
 				{
 					update_height(temp_curr->right_child);
 					update_balance_factor(temp_curr->right_child);
-				}	
+				}
 				update_height(temp_curr);
 				update_balance_factor(temp_curr);
-			}	
+			}
 		}
+		return change;
 	}
 
 	struct node * find_predecessor(struct node * curr_node)
@@ -266,14 +289,14 @@ class AVLTree
 		if(curr_node->left_child == NULL)
 		{
 			return curr_node;
-		}	
+		}
 		struct node * temp = curr_node->left_child;
 		while(temp->right_child!=NULL)
 		{
 			temp = temp->right_child;
 		}
 		return temp;
-	}	
+	}
 
 	int insert_node(struct node * curr_node, struct node * new_node)
 	{
@@ -286,7 +309,7 @@ class AVLTree
 		if((new_node->value) == (curr_node->value))
 		{
 			return 0;
-		}	
+		}
 		if((new_node->value) < (curr_node->value))
 		{
 			if(curr_node->left_child==NULL)
@@ -295,6 +318,7 @@ class AVLTree
 				new_node->parent = curr_node;
 				update_height(curr_node);
 				update_balance_factor(curr_node);
+				(curr_node->left_children)++;
 				return 1;
 			}
 			else
@@ -304,9 +328,13 @@ class AVLTree
 				{
 					update_height(curr_node);
 					update_balance_factor(curr_node);
-					check_and_balance_tree(curr_node);
-				}		
-			}	
+					int change = check_and_balance_tree(curr_node);
+					if(!change)
+					{
+						(curr_node->left_children)++;
+					}
+				}
+			}
 		}
 		else if((new_node->value) > (curr_node->value))
 		{
@@ -316,6 +344,7 @@ class AVLTree
 				new_node->parent = curr_node;
 				update_height(curr_node);
 				update_balance_factor(curr_node);
+				(curr_node->right_children)++;
 				return 1;
 			}
 			else
@@ -325,17 +354,22 @@ class AVLTree
 				{
 					update_height(curr_node);
 					update_balance_factor(curr_node);
-					check_and_balance_tree(curr_node);
-				}	
+					int change = check_and_balance_tree(curr_node);
+					if(!change)
+					{
+						(curr_node->right_children)++;
+					}
+				}
 			}
-		}	
+		}
 		return status;
 	}
 
 	int insert(int new_val)
 	{
-		return insert_node(root,create_node(new_val));
-	}	
+		struct node * new_node = create_node(new_val);
+		return insert_node(root,new_node);
+	}
 
 	struct node * find_node(struct node * curr_node, int target)
 	{
@@ -343,7 +377,7 @@ class AVLTree
 		if(root==NULL)
 		{
 			return NULL;
-		}	
+		}
 		if((curr_node->value) == target)
 		{
 			return curr_node;
@@ -355,7 +389,7 @@ class AVLTree
 		else if(((curr_node->value)<target) && curr_node->right_child!=NULL)
 		{
 			dest = find_node(curr_node->right_child, target);
-		}	
+		}
 		return dest;
 	}
 
@@ -380,152 +414,219 @@ class AVLTree
 				{
 					curr_node->right_child->parent = NULL;
 				}
-			}		
+			}
 			else
 			{
 				if(curr_node->parent->left_child == curr_node)
 				{
 					curr_node->parent->left_child = curr_node->right_child;
-				}	
+					if(curr_node->right_child!=NULL)
+					{
+							curr_node->parent->left_children--;
+					}
+					else
+					{
+						curr_node->parent->left_children = 0;
+					}
+				}
 				else if(curr_node->parent->right_child == curr_node)
 				{
 					curr_node->parent->right_child = curr_node->right_child;
-				}	
+					if(curr_node->right_child!=NULL)
+					{
+						curr_node->parent->right_children--;
+					}
+					else
+					{
+						curr_node->parent->right_children = 0;
+					}
+				}
 				if(curr_node->right_child!=NULL)
 				{
 					curr_node->right_child->parent = curr_node->parent;
-				}		
-			}	
+				}
+			}
 			curr_node = curr_node->parent;
-		}	
+		}
 		else
 		{
 			struct node * pred = find_predecessor(curr_node);
-			if(pred->value == 3)
-			{
-					int x;
-			}	
 			curr_node->value = pred->value;
-		
-			if(pred->parent == root)
+
+			if(pred->parent->left_child == pred)
 			{
-				root = pred->left_child;
+				pred->parent->left_child = pred->left_child;
 				if(pred->left_child!=NULL)
 				{
-					pred->left_child->parent = NULL;
+					pred->parent->left_children--;
+				}
+				else
+				{
+					pred->parent->left_children = 0;
 				}
 			}
-			else
+			else if(pred->parent->right_child == pred)
 			{
-				if(pred->parent->left_child == pred)
-				{
-					pred->parent->left_child = pred->left_child;
-				}
-				else if(pred->parent->right_child == pred)
-				{
-					pred->parent->right_child = pred->left_child;
-				}	
+				pred->parent->right_child = pred->left_child;
 				if(pred->left_child!=NULL)
 				{
-					pred->left_child->parent = pred->parent;
+					pred->parent->right_children--;
 				}
+				else
+				{
+					pred->parent->right_children = 0;
+				}
+			}
+			if(pred->left_child!=NULL)
+			{
+				pred->left_child->parent = pred->parent;
 			}
 			curr_node = pred->parent;
-		}	
-	
+		}
+
 		while(curr_node!=NULL)
 		{
 			update_height(curr_node);
 			update_balance_factor(curr_node);
 			check_and_balance_tree(curr_node);
+			if(curr_node->left_child!=NULL)
+			{
+				curr_node->left_children = (curr_node->left_child->left_children + curr_node->left_child->right_children + 1);
+			}
+			else
+			{
+				curr_node->left_children = 0;
+			}
+			if(curr_node->right_child!=NULL)
+			{
+				curr_node->right_children = (curr_node->right_child->left_children) + (curr_node->right_child->right_children + 1);
+			}
+			else
+			{
+				curr_node->right_children = 0;
+			}
 			curr_node = curr_node->parent;
 		}
 		return 1;
 	}
 
-	struct k_struct find_kth_smallest(struct node * curr_node, struct k_struct ks)
+	int find_kth_smallest(struct node * curr_root, int k)
 	{
-		if(curr_node==NULL)
+		if(curr_root==NULL || k==0)
 		{
-			return ks;
-		}	
-		ks = find_kth_smallest(curr_node->left_child, ks);
-		int set = 0;
-		if(ks.k>0)
-		{
-			ks.k--;
-			if(ks.k==0)
-			{
-				set = 1;
-			}	
+			//cout<<"\n\nRoot is null\n\n";
+			//exit(1);
+			return 0;
 		}
-		if(set)
+		int n = curr_root->left_children;
+		if(k==(n+1))
 		{
-			ks.kse = curr_node->value;
-		}	
-		ks = find_kth_smallest(curr_node->right_child, ks);
-		return ks;
+			return curr_root->value;
+		}
+		else
+		{
+			if(k<=n)
+			{
+				return find_kth_smallest(curr_root->left_child, k);
+			}
+			else
+			{
+				return find_kth_smallest(curr_root->right_child,(k-n-1));
+			}
+		}
+		return 0;
 	}
 
 	int find_kth_smallest(int k)
 	{
-		struct k_struct ks;
-		ks.k = k;
-		ks.kse = 0;
-		ks = find_kth_smallest(root,ks);
-		return ks.kse;
-	}	
+		return find_kth_smallest(root,k);
+	}
 
 	void print_tree()
-	{
-		if(root==NULL)
-		{
-			cout<<"\nTree is empty\n";
-			return;
-		}
-		queue<struct node *> bfsq;
-		bfsq.push(root);
-		while(!bfsq.empty())
-		{
-			struct node * curr_node = bfsq.front();
-			bfsq.pop();
-			int p;
-			if(curr_node->parent==NULL)
-			{
-				p=-1;
-			}	
-			else
-			{
-				p = curr_node->parent->value;
-			}	
-			cout<<"("<<curr_node->value<<"  "<<curr_node->height<<"  "<<curr_node->balance_factor<<"  "<<p<<")";
-			if(curr_node->left_child!=NULL)
-			{
-				bfsq.push((curr_node->left_child));
-			}
-			if(curr_node->right_child!=NULL)
-			{
-				bfsq.push((curr_node->right_child));
-			}
-		}
-		cout<<"\n";
-	}	
-	
+    {
+        if(root==NULL)
+        {
+            cout<<"\nTree is empty\n";
+            return;
+        }
+        queue<struct node *> bfsq;
+        bfsq.push(root);
+        while(!bfsq.empty())
+        {
+            struct node * curr_node = bfsq.front();
+            bfsq.pop();
+            int p;
+            if(curr_node->parent==NULL)
+            {
+                p=-1;
+            }
+            else
+            {
+                p = curr_node->parent->value;
+            }
+            cout<<"("<<curr_node->value<<"  "<<curr_node->left_children<<"  "<<curr_node->right_children<<")";
+            if(curr_node->left_child!=NULL)
+            {
+                bfsq.push((curr_node->left_child));
+            }
+            if(curr_node->right_child!=NULL)
+            {
+                bfsq.push((curr_node->right_child));
+            }
+        }
+        cout<<"\n";
+    }
+
 };
 
 
 int main()
 {
+	ios_base::sync_with_stdio(false);
 	AVLTree tree1;
-	tree1.insert(30);
-	tree1.insert(15);
-	tree1.insert(40);
-	tree1.insert(10);
-	tree1.insert(25);
-	tree1.insert(35);
-	tree1.insert(50);
-	tree1.insert(5);
-	tree1.print_tree();
-	cout<<"\n";
+	int N, M;
+	cin>>N>>M;
+	for(int i=0; i<N; i++)
+	{
+		int x;
+		cin>>x;
+		tree1.insert(x);
+	}
+	for(int i=0; i<M; i++)
+	{
+		int q,val;
+		cin>>q>>val;
+		if(q==1)
+		{
+			tree1.insert(val);
+		}
+		else if(q==2)
+		{
+			struct node * temp = tree1.find(val);
+			if(temp==NULL)
+			{
+				cout<<0;
+			}
+			else
+			{
+				cout<<1;
+			}
+			if(i!=(M-1))
+			{
+				cout<<endl;
+			}
+		}
+		else if(q==3)
+		{
+			int s = tree1.find_kth_smallest(val);
+			cout<<s;
+			tree1.remove(s);
+			if(i!=(M-1))
+			{
+				cout<<endl;
+			}
+		}
+	}
+	//cout<<"\n";
 	return 0;
 }

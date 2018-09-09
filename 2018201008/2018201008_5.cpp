@@ -1,5 +1,4 @@
 #include<iostream>
-#include<queue>
 #include<stdio.h>
 
 using namespace std;
@@ -7,24 +6,24 @@ using namespace std;
 class min_priority_queue
 {
 	public:
-	
-	float * pri_queue;
+
+	double * pri_queue;
 	int size;
 	int max_size;
-	
+
 	min_priority_queue(int n)
 	{
-		pri_queue = (float *)malloc(n*sizeof(float));
+		pri_queue = (double *)malloc(n*sizeof(double));
 		size = 0;
 		max_size = n;
 	}
-	
+
 	int get_heap_size()
 	{
 		return size;
 	}
-	
-	float get_min_element()
+
+	double get_min_element()
 	{
 		if(size==0)
 		{
@@ -33,7 +32,7 @@ class min_priority_queue
 		}
 		return pri_queue[0];
 	}
-	
+
 	int get_parent(int index)
 	{
 		if(index==0)
@@ -49,7 +48,7 @@ class min_priority_queue
 			return (index/2);
 		}
 	}
-	
+
 	int get_left_child(int index)
 	{
 		int lc = (index*2) + 1;
@@ -59,7 +58,7 @@ class min_priority_queue
 		}
 		return lc;
 	}
-	
+
 	int get_right_child(int index)
 	{
 		int rc = (index*2)+2;
@@ -69,8 +68,8 @@ class min_priority_queue
 		}
 		return rc;
 	}
-	
-	void insert(float x)
+
+	void insert(double x)
 	{
 		if(size>=max_size)
 		{
@@ -83,7 +82,7 @@ class min_priority_queue
 		{
 			if(pri_queue[parent]>pri_queue[curr_index])
 			{
-				float temp = pri_queue[parent];
+				double temp = pri_queue[parent];
 				pri_queue[parent] = pri_queue[curr_index];
 				pri_queue[curr_index] = temp;
 				curr_index = parent;
@@ -96,8 +95,8 @@ class min_priority_queue
 		}
 		size++;
 	}
-	
-	float extract_min()
+
+	double extract_min()
 	{
 		if(size==0)
 		{
@@ -106,11 +105,11 @@ class min_priority_queue
 		}
 		if(size==1)
 		{
-			float x = pri_queue[0];
+			double x = pri_queue[0];
 			size--;
 			return x;
 		}
-		float min = pri_queue[0];
+		double min = pri_queue[0];
 		pri_queue[0] = pri_queue[size-1];
 		pri_queue[size-1] = min;
 		size--;
@@ -134,7 +133,7 @@ class min_priority_queue
 			}
 			else
 			{
-				float temp = pri_queue[c_i];
+				double temp = pri_queue[c_i];
 				pri_queue[c_i] = pri_queue[min_i];
 				pri_queue[min_i] = temp;
 			}
@@ -143,62 +142,33 @@ class min_priority_queue
 			r_i = get_right_child(c_i);
 		}
 		return min;
-		
+
 	}
-	
-	void print_tree()
-	{
-		if(size==0)
-		{
-			cout<<"\n\nHeap is empty\n\n";
-			return;
-		}
-		cout<<"\n\n";
-		queue<int> iq;
-		iq.push(0);
-		while(!iq.empty())
-		{
-			int i = iq.front();
-			iq.pop();
-			cout<<pri_queue[i]<<"   ";
-			int lc = get_left_child(i);
-			int rc = get_right_child(i);
-			if(lc<size && lc!=-1)
-			{
-				iq.push(lc);
-			}
-			if(rc<size && rc!=-1)
-			{
-				iq.push(rc);
-			}
-		}
-		cout<<"\n\n";
-	}
-	
-	
+
+
 };
 
 class max_priority_queue
 {
 	public:
-	
-	float * pri_queue;
+
+	double * pri_queue;
 	int size;
 	int max_size;
-	
+
 	max_priority_queue(int n)
 	{
-		pri_queue = (float *)malloc(n*sizeof(float));
+		pri_queue = (double *)malloc(n*sizeof(double));
 		size = 0;
 		max_size = n;
 	}
-	
+
 	int get_heap_size()
 	{
 		return size;
 	}
-	
-	float get_max_element()
+
+	double get_max_element()
 	{
 		if(size==0)
 		{
@@ -207,7 +177,7 @@ class max_priority_queue
 		}
 		return pri_queue[0];
 	}
-	
+
 	int get_parent(int index)
 	{
 		if(index==0)
@@ -223,7 +193,7 @@ class max_priority_queue
 			return (index/2);
 		}
 	}
-	
+
 	int get_left_child(int index)
 	{
 		int lc = (index*2) + 1;
@@ -233,7 +203,7 @@ class max_priority_queue
 		}
 		return lc;
 	}
-	
+
 	int get_right_child(int index)
 	{
 		int rc = (index*2)+2;
@@ -243,8 +213,8 @@ class max_priority_queue
 		}
 		return rc;
 	}
-	
-	void insert(float x)
+
+	void insert(double x)
 	{
 		if(size>=max_size)
 		{
@@ -257,7 +227,7 @@ class max_priority_queue
 		{
 			if(pri_queue[parent]<pri_queue[curr_index])
 			{
-				float temp = pri_queue[parent];
+				double temp = pri_queue[parent];
 				pri_queue[parent] = pri_queue[curr_index];
 				pri_queue[curr_index] = temp;
 				curr_index = parent;
@@ -270,8 +240,8 @@ class max_priority_queue
 		}
 		size++;
 	}
-	
-	float extract_max()
+
+	double extract_max()
 	{
 		if(size==0)
 		{
@@ -280,11 +250,11 @@ class max_priority_queue
 		}
 		if(size==1)
 		{
-			float x = pri_queue[0];
+			double x = pri_queue[0];
 			size--;
 			return x;
 		}
-		float max = pri_queue[0];
+		double max = pri_queue[0];
 		pri_queue[0] = pri_queue[size-1];
 		pri_queue[size-1] = max;
 		size--;
@@ -308,7 +278,7 @@ class max_priority_queue
 			}
 			else
 			{
-				float temp = pri_queue[c_i];
+				double temp = pri_queue[c_i];
 				pri_queue[c_i] = pri_queue[max_i];
 				pri_queue[max_i] = temp;
 			}
@@ -317,39 +287,10 @@ class max_priority_queue
 			r_i = get_right_child(c_i);
 		}
 		return max;
-		
+
 	}
-	
-	void print_tree()
-	{
-		if(size==0)
-		{
-			cout<<"\n\nHeap is empty\n\n";
-			return;
-		}
-		cout<<"\n\n";
-		queue<int> iq;
-		iq.push(0);
-		while(!iq.empty())
-		{
-			int i = iq.front();
-			iq.pop();
-			cout<<pri_queue[i]<<"   ";
-			int lc = get_left_child(i);
-			int rc = get_right_child(i);
-			if(lc<size && lc!=-1)
-			{
-				iq.push(lc);
-			}
-			if(rc<size && rc!=-1)
-			{
-				iq.push(rc);
-			}
-		}
-		cout<<"\n\n";
-	}
-	
-	
+
+
 };
 
 int main()
@@ -357,84 +298,54 @@ int main()
 	int N;
 	scanf("%d",&N);
 	int W = ((N+4)/2);
+	double median = 0;
 	max_priority_queue MAX = max_priority_queue(W);
 	min_priority_queue MIN = min_priority_queue(W);
 	for(int i=0; i<N; i++)
 	{
-		float e;
+		double e;
 		scanf("%f",&e);
 		if(MAX.get_heap_size()==0)
 		{
 			MAX.insert(e);
+			median = e;
 		}
 		else
 		{
-			float max_max = MAX.get_max_element();
-			//int min_min = MIN.get_min_element();
-			if(e <= max_max)
+			if(e<=median)
 			{
 				if(MAX.get_heap_size() > MIN.get_heap_size())
 				{
-					max_max = MAX.extract_max();
-					MIN.insert(max_max);
-					MAX.insert(e);
+					double f = MAX.extract_max();
+					MIN.insert(f);
 				}
-				else
-				{
-					MAX.insert(e);
-				}
-			}
-			else if(e>max_max && MIN.get_heap_size()==0)
-			{
-				MIN.insert(e);
+				MAX.insert(e);
 			}
 			else
 			{
-				float min_min = MIN.get_min_element();
-				if(e>max_max && e<=min_min)
+				if(MIN.get_heap_size() > MAX.get_heap_size())
 				{
-					if(MAX.get_heap_size() == MIN.get_heap_size())
-					{
-						MAX.insert(e);
-					}
-					else if(MAX.get_heap_size()>MIN.get_heap_size())
-					{
-						MIN.insert(e);
-					}
-					else
-					{
-						MAX.insert(e);
-					}
+					double f = MIN.extract_min();
+					MAX.insert(f);
 				}
-				else if(e > max_max && e > min_min)
-				{
-					if(MIN.get_heap_size() < MAX.get_heap_size())
-					{
-						MIN.insert(e);
-					}
-					else
-					{
-						min_min = MIN.extract_min();
-						MIN.insert(e);
-						MAX.insert(min_min);
-					}
-				}
+				MIN.insert(e);
+			}
+			if(MAX.get_heap_size() > MIN.get_heap_size())
+			{
+				median = MAX.get_max_element();
+			}
+			else if(MIN.get_heap_size() > MAX.get_heap_size())
+			{
+				median = MIN.get_max_element();
+			}
+			else
+			{
+				double x = MAX.get_max_element();
+				double y = MIN.get_min_element();
+				median = ((x+y)/2);
 			}
 		}
-		if((MIN.get_heap_size()==0) || (MIN.get_heap_size() < MAX.get_heap_size()))
-		{
-			printf("%0.1f",(double)MAX.get_max_element());
-		}
-		else if((MAX.get_heap_size()) == (MIN.get_heap_size()))
-		{
-			float a = MAX.get_max_element();
-			float b = MIN.get_min_element();
-			printf("%0.1f",(double)((a+b)/2));
-		}
-		else
-		{
-			printf("%0.1f",(double)MIN.get_min_element());
-		}
+		printf("%0.1f",median);
 		if(i!=(N-1))
 		{
 				cout<<"\n";
