@@ -168,6 +168,166 @@ class BigInteger
     return res;
   }
 
+  string product(string num, char m)
+  {
+    string zero = "0";
+    string result = "";
+    num = zero.append(num);
+    int carry = 0;
+    for(int i=(num.length() - 1); i>=0; i--)
+    {
+      int x = (num[i] - '0');
+      int y = m - '0';
+      int z = x*y;
+      z = z+carry;
+      string res = to_string(z%10);
+      carry = z/10;
+      result = res.append(result);
+    }
+    return result;
+  }
+  BigInteger gcd(BigInteger num1, BigInteger num2)
+  {
+    string n1 = num1.get_absolute_value();
+    string n2 = num2.get_absolute_value();
+    if(n1.length()==1 && n1[0]=='0')
+    {
+      return num2;
+    }
+    else if(n2.length()==1 && n2[0]=='0')
+    {
+      return num1;
+    }
+    BigInteger temp1 = BigInteger(n1);
+    BigInteger temp2 = BigInteger(n2);
+    if(compare(temp1,temp2)==1)
+    {
+      return gcd(temp1.subtract(temp2), temp2);
+    }
+    if(compare(temp1,temp2)<=0)
+    {
+      return gcd(temp1, temp2.subtract(temp1));
+    }
+    return temp1;
+  }
+  BigInteger divide(BigInteger num2)
+  {
+    struct number number2 = num2.get_number();
+    char s1 = number1.sign;
+    char s2 = number2.sign;
+    char r_s = '+';
+    BigInteger result;
+    if((s1=='+' && s2=='+') || (s1=='-' && s2=='-'))
+    {
+      r_s = '+';
+    }
+    else
+    {
+      r_s = '-';
+    }
+    string n1 = get_absolute_value();
+    string n2 = num2.get_absolute_value();
+    string mult_table[10];
+    for(int i=0; i<10; i++)
+    {
+      char ind = (i+1)+'0';
+      string prod = product(n2,ind);
+      if(prod[0]=='0' && !prod.empty())
+      {
+        prod = prod.substr(1,(prod.length()-1));
+      }
+      mult_table[i] = prod;
+    }
+    string quotient = "";
+    string sub = "";
+    int i=1;
+    sub+=n1[0];
+    while(i<n1.length())
+    {
+      if(sub.length()==1 && sub[0]=='0')
+      {
+        quotient+='0';
+        i++;
+        if(i<n1.length())
+        {
+          sub = n1[i];
+        }
+        continue;
+      }
+      BigInteger temp1 = BigInteger(sub);
+      while(i<n1.length() && (compare(num2,temp1)==1))
+      {
+        sub+=n1[i];
+        temp1 = BigInteger(sub);
+        i++;
+      }
+      if(compare(num2,temp1) == 1)
+      {
+        break;
+      }
+      int j=0;
+      for( ; j<10; j++)
+      {
+        string mul = mult_table[j];
+        BigInteger mb = BigInteger(mul);
+        if(compare(mb,temp1)==1)
+        {
+          break;
+        }
+      }
+      string qs = to_string(j);
+      quotient = quotient.append(qs);
+      j--;
+      BigInteger diff = BigInteger(mult_table[j]);
+      BigInteger sub1 = temp1.subtract(diff);
+      sub = sub1.get_absolute_value();
+    }
+    if(quotient.empty())
+    {
+      quotient = "0";
+    }
+    return quotient;
+  }
+  BigInteger multiply(BigInteger num2)
+  {
+    struct number number2 = num2.get_number();
+    char s1 = number1.sign;
+    char s2 = number2.sign;
+    char r_s = '+';
+    BigInteger result;
+    if((s1=='+' && s2=='+') || (s1=='-' && s2=='-'))
+    {
+      r_s = '+';
+    }
+    else
+    {
+      r_s = '-';
+    }
+    string n1 = get_absolute_value();
+    string n2 = num2.get_absolute_value();
+    int z = 0;
+    string final_product = "0";
+    for(int i=(n2.length() - 1); i>=0; i--)
+    {
+      string prod = product(n1,n2[i]);
+      string zeros = "";
+      for(int j=0; j<z; j++)
+      {
+        zeros = zeros+'0';
+      }
+      prod = prod.append(zeros);
+      BigInteger temp1 = BigInteger(final_product);
+      BigInteger temp2 = BigInteger(prod);
+      BigInteger temp_sum = temp1.add(temp2);
+      final_product = temp_sum.get_absolute_value();
+      z++;
+    }
+    string r_s_s = string(1,r_s);
+    final_product = r_s_s.append(final_product);
+    result = BigInteger(final_product);
+    return result;
+  }
+
   BigInteger subtract(BigInteger num2)
   {
     struct number number2 = num2.get_number();
@@ -319,11 +479,44 @@ class BigInteger
 };
 int main()
 {
-  string x = "3124";
-  string y = "-1119";
-  BigInteger a = BigInteger(x);
-  BigInteger b = BigInteger(y);
-  BigInteger c = a.add(b);
-  cout<<c.get_value()<<endl;
+  int T;
+  cin>>T;
+  for(int t=0; t<T; t++)
+  {
+    string n1;
+    string n2;
+    int op;
+    cin>>n1;
+    cin>>n2;
+    cin>>op;
+    BigInteger a = BigInteger(n1);
+    BigInteger b = BigInteger(n2);
+    BigInteger c;
+    if(op==1)
+    {
+      c = a.add(b);
+    }
+    else if(op==2)
+    {
+      c = a.subtract(b);
+    }
+    else if(op==3)
+    {
+      c = a.multiply(b);
+    }
+    else if(op==4)
+    {
+      c = a.divide(b);
+    }
+    else if(op==5)
+    {
+      c = a.gcd(a,b);
+    }
+    cout<<c.get_value();
+    if(t!=(T-1))
+    {
+      cout<<endl;
+    }
+  }
   return 0;
 }
