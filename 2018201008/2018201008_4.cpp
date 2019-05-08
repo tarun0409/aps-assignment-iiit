@@ -6,19 +6,19 @@ using namespace std;
 class vector
 {
 	public:
-	
+
 	int * array;
 	int max_size;
 	int start_index;
 	int end_index;
-	
+
 	vector()
 	{
 		start_index = 0;
 		end_index = 0;
 		max_size = 0;
 	}
-	
+
 	vector(int n,int x)
 	{
 		array = (int *)calloc(n,sizeof(int));
@@ -31,7 +31,7 @@ class vector
 			end_index++;
 		}
 	}
-	
+
 	void push_back(int x)
 	{
 		if(max_size<=0)
@@ -52,7 +52,7 @@ class vector
 		array[end_index] = x;
 		end_index++;
 	}
-	
+
 	void pop_back()
 	{
 		end_index--;
@@ -71,7 +71,7 @@ class vector
 			array = new_array;
 		}
 	}
-	
+
 	void insert(int index,int x)
 	{
 		if(index<start_index || index>=end_index)
@@ -96,7 +96,7 @@ class vector
 		array[index] = x;
 		end_index++;
 	}
-	
+
 	void erase(int index)
 	{
 		if(index<start_index || index>=end_index)
@@ -124,7 +124,7 @@ class vector
 			array = new_array;
 		}
 	}
-	
+
 	int operator[](int index)
 	{
 		if(index<start_index || index>=end_index)
@@ -134,12 +134,12 @@ class vector
 		}
 		return array[index];
 	}
-	
+
 	int size()
 	{
 		return end_index;
 	}
-	
+
 	int front()
 	{
 		if(end_index==0)
@@ -149,7 +149,7 @@ class vector
 		}
 		return array[start_index];
 	}
-	
+
 	int back()
 	{
 		if(end_index==0)
@@ -159,7 +159,7 @@ class vector
 		}
 		return array[end_index-1];
 	}
-	
+
 };
 
 
@@ -172,10 +172,10 @@ int main()
 		vec.push_back(i);
 		cout<<endl<<"Pushed "<<i<<" size="<<vec.size()<<" max size = "<<vec.max_size<<endl;
 	}
-	for(int i=1; i<=30; i++)
+	for(int i=1; i<=68; i++)
 	{
-		vec.erase(6);
-		cout<<endl<<"Erased "<<i<<" size="<<vec.size()<<" max size = "<<vec.max_size<<endl;
+		vec.pop_back();
+		cout<<endl<<"Popped "<<i<<" size="<<vec.size()<<" max size = "<<vec.max_size<<endl;
 	}
 	cout<<endl;
 	for(int i=0; i<vec.size(); i++)
